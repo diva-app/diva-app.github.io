@@ -10,12 +10,12 @@ if (button) {
         $p.spr.startSpeachRecognation();
     });
 }
-var recognition = new webkitSpeechRecognition();
+
 
 var voices = [];
 $p.spr={
-    
 load:function($elm){
+    var recognition = new webkitSpeechRecognition();
     recognition.lang = 'fa-IR'
     recognition.continuous = true;
     recognition.interimResults = true;
