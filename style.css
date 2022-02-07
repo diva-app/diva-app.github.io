@@ -1,0 +1,25 @@
+
+#btn {
+    background-color: #4CAF50;
+    border: none;
+    background: url("./images/btn.png") no-repeat top left;
+    padding: 2px 8px;
+    cursor: pointer;
+    position: absolute;
+    top: 130;
+    left: 10;
+    width: 20;
+    height: 20;
+}
+#btn:hover{
+    background-color: #f0310f;
+    border: none;
+    background: url("./images/btn_hover.png") no-repeat top left;
+    padding: 2px 8px;
+    cursor: pointer;
+    position: absolute;
+    top: 130;
+    left: 10;
+    width: 20;
+    height: 20;
+}
