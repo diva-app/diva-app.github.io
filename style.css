@@ -7,8 +7,8 @@
     position: absolute;
     right: 22%;
     top: 14px;
-    width: 20;
-    height: 20;
+    width: 10%;
+    height: 10%;
 }
 #btn:hover{
     background: url("./images/btn_hover.png") no-repeat top left;
@@ -16,7 +16,7 @@
 }
 #text_erea {
     width: 80%;
-    height: 30px;
+    height: 100%;
 }
 p {
     background-color: aquamarine;
@@ -26,4 +26,5 @@ p {
 }
 #container{
     width: 100%;
+    height:50%;
 }
