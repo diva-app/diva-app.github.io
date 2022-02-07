@@ -4,6 +4,7 @@ var synth = window.speechSynthesis;
 
 var inputTxt = document.querySelector('#text_erea');
 var button = document.querySelector("#btn");
+var result = document.querySelector('#result');
 
 if (button) {
     button.addEventListener('click', function(){
@@ -32,7 +33,9 @@ load:function($elm){
     };
 }
 ,startSpeachRecognation:function(){
+    inputTxt.textContent = 'Listening .... ';
     recognition.start();
+    
 },
 stopSpeachRecognation:function(){
     recognition.stop();

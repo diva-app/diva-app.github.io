@@ -14,7 +14,7 @@
     background: url("./images/btn_hover.png") no-repeat top left;
     background-size: 100% 100%;
 }
-input[type=text] {
+#text_erea {
     width: 80%;
     height: 30px;
 }
