@@ -1,25 +1,20 @@
 
 #btn {
-    background-color: #4CAF50;
     border: none;
     background: url("./images/btn.png") no-repeat top left;
-    padding: 2px 8px;
+    background-size: 100% 100%;
     cursor: pointer;
     position: absolute;
-    top: 130;
+    bottom: 10;
     left: 10;
-    width: 20;
-    height: 20;
+    width: 6%;
+    height: 4%;
 }
 #btn:hover{
-    background-color: #f0310f;
-    border: none;
     background: url("./images/btn_hover.png") no-repeat top left;
-    padding: 2px 8px;
-    cursor: pointer;
-    position: absolute;
-    top: 130;
-    left: 10;
-    width: 20;
-    height: 20;
+    background-size: 100% 100%;
+}
+#text_erea{
+ width: 100%;
+ height: 100%;   
 }

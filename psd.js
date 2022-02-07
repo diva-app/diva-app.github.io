@@ -21,16 +21,21 @@ load:function($elm){
   
     recognition.onresult = function (event) {
      for (var i = event.resultIndex; i < event.results.length; ++i) {
-       inputTxt.textContent = event.results[i][0].transcript+"asda";
+       inputTxt.textContent = event.results[i][0].transcript;
       if (event.results[i].isFinal) {
         inputTxt.textContent = event.results[i][0].transcript;
-        recognition.stop();
+        stopSpeachRecognation();
       }
      }
     };
 }
 ,startSpeachRecognation:function(){
     recognition.start();
+    button.style.display = 'none';
+},
+stopSpeachRecognation:function(){
+    recognition.stop();
+    button.style.display = 'block';
 }
 
 }
