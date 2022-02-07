@@ -10,10 +10,11 @@ if (button) {
         $p.spr.startSpeachRecognation();
     });
 }
+var recognition = new webkitSpeechRecognition();
 
 var voices = [];
 $p.spr={
-    var: recognition = new webkitSpeechRecognition(), 
+    
 load:function($elm){
     recognition.lang = 'fa-IR'
     recognition.continuous = true;
@@ -31,11 +32,9 @@ load:function($elm){
 }
 ,startSpeachRecognation:function(){
     recognition.start();
-    button.style.display = 'none';
 },
 stopSpeachRecognation:function(){
     recognition.stop();
-    button.style.display = 'block';
 }
 
 }
