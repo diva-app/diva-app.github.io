@@ -7,6 +7,7 @@ var button = document.querySelector("#btn");
 
 if (button) {
     button.addEventListener('click', function(){
+        inputTxt.textContent = "dasdadas";
         $p.spr.recognize();
     });
 }
@@ -24,13 +25,14 @@ load:function($elm){
   
     recognition.onresult = function (event) {
      for (var i = event.resultIndex; i < event.results.length; ++i) {
-       inputTxt.text = event.results[i][0].transcript;
+       inputTxt.textContent = event.results[i][0].transcript+"asda";
       if (event.results[i].isFinal) {
-        inputTxt.text = event.results[i][0].transcript;
+        inputTxt.textContent = event.results[i][0].transcript+ "end";
         recognition.stop();
       }
      }
     };
+
     recognition.start();
   
 }
