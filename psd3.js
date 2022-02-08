@@ -44,6 +44,7 @@ $p.spr = {
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     this.result = event.results[i][0].transcript;
+                    resultText.textContent = event.results[i][0].transcript;
                     stopSpeachRecognation();
                 }
             }
@@ -63,7 +64,7 @@ $p.spr = {
     stopSpeachRecognation:function(){
         //stop recognition
         recognition.stop();
-        resultText.textContent = result;
+        
     },
     //result is the final result of the recognition
     result:""
