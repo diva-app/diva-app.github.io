@@ -40,15 +40,17 @@ $p.spr = {
         //set interim results to true
         recognition.interimResults = true;
         //add event listener for result
-        recognition.onresult = function (event) {
-            for (var i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    this.result = event.results[i][0].transcript;
-                    resultText.textContent = event.results[i][0].transcript;
-                    stopSpeachRecognation();
-                }
+        recognition.onresult = function(event){
+            //get the last result
+            var result = event.results[event.results.length - 1];
+            //set result text to the last result
+            resultText.textContent = result[0].transcript;
+            //if result is final, stop recognition
+            if(result.isFinal){
+                $p.spr.stopSpeachRecognation();
             }
         }
+        
     },
     startSpeachRecognation:function(){
         //start recognition
