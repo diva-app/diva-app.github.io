@@ -13,10 +13,12 @@ var checkbox = document.querySelector("input[type='checkbox']");
 checkbox.addEventListener('change', function(){
     if(checkbox.checked){
         $p.spr.changeLanguage('en-US');
+        resultText.textContent = "language change to " + recognition.lang;
     }else{
         $p.spr.changeLanguage('fa-IR');
+        resultText.textContent = "زبان به " + recognition.lang;
     }
-    resultText.textContent = recognition.lang;
+    
 });
 
 //if button exists, add click event for start recognition
@@ -28,13 +30,11 @@ if (button) {
     });
 }
 
-
-
 $p.spr = {
     //load speech recognition
     load:function($elm){
         //set recognition language to parameter or default to English
-        recognition.lang = $elm.attr('data-lang') || 'en-US';
+        // recognition.lang = $elm.attr('data-lang') || 'en-US';
         //set continuous mode to true
         recognition.continuous = true;
         //set interim results to true
@@ -53,8 +53,12 @@ $p.spr = {
         //start recognition
         recognition.start();
         //set result to listening
-        this.result = 'Listening .... ';
-        
+        //if language is English else set to listening in Farsi
+        if(recognition.lang == 'en-US'){
+            this.result = 'Listening...';
+        }else{  
+            this.result = 'در حال گوش دادن ...';
+        }        
     },
     stopSpeachRecognation:function(){
         //stop recognition
