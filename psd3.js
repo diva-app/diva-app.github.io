@@ -29,9 +29,6 @@ if (button) {
         resultText.textContent = $p.spr.result;
     });
 }
-$p.spr.addResultListener(function(result){
-    resultText.textContent = result;
-});
 
 $p.spr = {
     //load speech recognition
@@ -66,16 +63,13 @@ $p.spr = {
     stopSpeachRecognation:function(){
         //stop recognition
         recognition.stop();
+        resultText.textContent = result;
     },
     //result is the final result of the recognition
     result:""
     //change recognition language function
     ,changeLanguage:function(lang){
         recognition.lang = lang;
-    }
-    //add listner change result
-    ,addResultListener:function(callback){
-        recognition.onresult = callback;
     }
 };
 
