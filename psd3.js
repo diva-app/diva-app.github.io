@@ -1,82 +1,70 @@
-var $p ={};
+var $p = {};
 
 var synth = window.speechSynthesis;
 //create speech recognition object
 var recognition = new webkitSpeechRecognition();
 
 var resultText = document.querySelector('.text_area');
-var button = document.querySelector(".mic");
+var mic_fa = document.querySelector(".mic-fa");
+var mic_en = document.querySelector(".mic-en");
 
-//queryselector type of checkbox input
-var checkbox = document.querySelector("input[type='checkbox']");
-//is checkbox checked change recognition language
-checkbox.addEventListener('change', function(){
-    if(checkbox.checked){
-        $p.spr.changeLanguage('en-US');
-        resultText.textContent = "language change to " + recognition.lang;
-    }else{
-        $p.spr.changeLanguage('fa-IR');
-        resultText.textContent = "زبان به " + recognition.lang;
-    }
-    
+
+mic_fa.addEventListener("click", function () {
+    $p.spr.load({ language: "fa-IR" });
+    mic_fa.style.color = "#CD0000";
+    resultText.textContent = "در حال گوش دادن ...";
+    resultText.style.direction = "rtl";
+    $p.spr.startSpeachRecognation();
 });
 
-//if button exists, add click event for start recognition
-if (button) {
-    button.addEventListener('click', function(){
-        $p.spr.load();
-        $p.spr.startSpeachRecognation();
-        resultText.textContent = $p.spr.result;
-    });
-}
+mic_en.addEventListener("click", function () {
+    $p.spr.load({ language: "en-US" });
+    mic_en.style.color = "#CD0000";
+    resultText.textContent = "Listening ...";
+    resultText.style.direction = "ltr";
+    $p.spr.startSpeachRecognation();
+});
+
 
 $p.spr = {
     //load speech recognition
-    load:function($elm){
-        //set recognition language to parameter or default to English
-        // recognition.lang = $elm.attr('data-lang') || 'en-US';
-        //set continuous mode to true
+    load: function ($elm) {
+        recognition.lang = $elm.language;
         recognition.continuous = true;
-        //set interim results to true
         recognition.interimResults = true;
-        //add event listener for result
-        recognition.onresult = function(event){
-            //get the last result
-            var result = event.results[event.results.length - 1];
-            //set result text to the last result
-            resultText.textContent = result[0].transcript;
-            //if result is final, stop recognition
-            if(result.isFinal){
-                $p.spr.stopSpeachRecognation();
+
+    },
+    startSpeachRecognation: function () {
+        recognition.start();
+    },
+    stopSpeachRecognation: function () {
+        recognition.stop();
+    },
+    onResult: function (event) {
+        var re = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                re += event.results[i][0].transcript;
+            } else {
+                re += event.results[i][0].transcript;
             }
         }
-        
+        $p.spr.stopSpeachRecognation();
+        $p.spr.changeView(re);
     },
-    startSpeachRecognation:function(){
-        //start recognition
-        recognition.start();
-        //set result to listening
-        //if language is English else set to listening in Farsi
-        if(recognition.lang == 'en-US'){
-            this.result = 'Listening...';
-        }else{  
-            this.result = 'در حال گوش دادن ...';
-        }        
-    },
-    stopSpeachRecognation:function(){
-        //stop recognition
-        recognition.stop();
-        
-    },
-    //result is the final result of the recognition
-    result:""
-    //change recognition language function
-    ,changeLanguage:function(lang){
-        recognition.lang = lang;
+    changeView: function (text) {
+        mic_fa.style.color = "grey";
+        mic_en.style.color = "grey";
+        resultText.textContent = text;
     }
 };
 
+recognition.onresult = $p.spr.onResult;
+recognition.onerror = function (event) {
+    console.log("Error: " + event.error);
+};
 
- 
+
+
 
 
