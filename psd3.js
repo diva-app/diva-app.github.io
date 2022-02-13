@@ -29,10 +29,27 @@ mic_en.addEventListener("click", function () {
 $p.spr = {
     //load speech recognition
     load: function ($elm) {
+        let _id=this.fId($elm);
+
+        // let vInput="<input id='"+_id+"_input+"'></input>";
+        $elm.html(vInput);
+       
         recognition.lang = $elm.language;
         recognition.continuous = true;
         recognition.interimResults = true;
 
+    },
+    fSet:function($elm,pValue){
+        let _id=this.fId($elm);
+        $("#"+_id+"_input").val(pValue);
+
+    },
+    fGet:function($elm){
+        let _id=this.fId($elm);
+        return $("#"+_id+"_input").val();
+    },
+    fId:function($elm){
+        return $elm.attr("id");
     },
     startSpeachRecognation: function () {
         recognition.start();
