@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Document 1</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/d6a8742f66.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0 content">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="psdSpr.js"></script>
+    <script >
+        $(document).ready(function(){
+            $p.spr.fLoad("text","micen","micfa","pen","canvas","clear");
+        });
+    </script>
+</head>
+
+<body>
+
+    <div class="container">
+        <textarea id="text" class="text_area"></textarea>
+        <div class="mic_container">
+            <div class="mic mic-en">
+                <span id="micen" class="mic-en" style="font-size: 2em;">
+                    <i class="fa-solid  fa-microphone"></i>
+                </span>
+                <span >انگلیسی</span>
+            </div>
+            <div class="mic mic-fa">
+                <span id="micfa" class="mic-fa" style=" font-size: 2em;">
+                     <i class="fa-solid  fa-microphone"></i>
+                </span>
+                <span >فارسی</span>
+            </div>
+            <div class="mic mic-fa">
+                <span id="pen" class="mic-fa" style=" font-size: 2em;">
+                     <i class="fa-solid fa-pen"></i>
+                </span>
+                <span >قلم</span>
+            </div>
+            <div class="mic mic-fa">
+                <span id="clear" class="mic-fa" style=" font-size: 2em;">
+                     <i class="fa-solid fa-pen"></i>
+                </span>
+                <span >حذف</span>
+            </div>
+        </div>
+        
+    </div>
+    <canvas id="canvas" ></canvas>
+</body>
+
+</html>

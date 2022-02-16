@@ -71,6 +71,9 @@ span{
     transition: .4s;
     
   }
+  canvas{
+    background-color: blueviolet;
+  }
   
   .slider:before {
     position: absolute;

@@ -1,19 +1,25 @@
 
 $p = {};
 
-$p.spr = {
-    fLoad: function ($element) {
-        this.textArea = $p.textArea.fCreate($element);
 
-        this.mic_container = $p.micContainer.fCreate($element);
+$p.spr = {
+    fLoad: function ($textViewElement,$iconsElement,$handWritingElement) {
+        this.textArea = $p.textArea.fCreate($textViewElement);
+
+        if($iconsElement) {
+            this.mic_container = $p.micContainer.fCreate($iconsElement);
+        }else{
+            this.mic_container = $p.micContainer.fCreate($textViewElement);
+        }
 
         this.mic_en = $p.mic_en.fCreate(this.mic_container.pId);
         this.mic_fa = $p.mic_fa.fCreate(this.mic_container.pId);
+        this.handWritingIcon = $p.handIcon.fCreate(this.mic_container.pId);
 
-        this.handWriting = $p.handWriting.fCreate($element);
+        this.handWritingElement = $handWritingElement;
+        
 
-
-        // this.fInitialize();
+        this.fInitialize();
 
 
 
@@ -51,6 +57,14 @@ $p.spr = {
         this.mic_en.fChangeToRecording();
         this.mic_fa.isRecording = false;
         this.mic_fa.fChangeToRecording();
+    },
+    fShowHandWriting: function (isShow) {
+        if (isShow) {
+            this.handWriting = $p.handWriting.fCreate(this.handWritingElement);  
+        } else {
+            this.handWriting = $p.handWriting.fRemove(this.handWritingElement);  
+        }
+        
     }
 };
 $p.textArea = {
@@ -75,10 +89,10 @@ $p.textArea = {
             'resize': 'none',
         });
     },
-};
+}
 $p.mic_en = {
-    fCreate: function ($parentId) {
-        this.$lang = "en-US";
+    fCreate: function ($parentId,$language) {
+        this.$lang = $language;
         this.micSpanId = $parentId + "_mic_span" + this.$lang;
         this.containerId = $parentId + "_mic_container" + this.$lang;
         this.micId = $parentId + "_mic" + this.$lang;
@@ -123,9 +137,9 @@ $p.mic_en = {
         });
         $("#" + this.micSpanId).html("<i id=" + this.micId + "></i>");
         $("#" + this.micId).addClass(this.fontAwesomeMic);
-        $("#" + this.micId).css({ 'font-size': '2em', });
+        $("#" + this.micId).css({ 'font-size': '1.5em', });
 
-        $("#" + this.containerId).append("<span style='display: block;font-size: 1em;' >" + text + "</span>");
+        $("#" + this.containerId).append("<span style='display: block;font-size: 0.7em;' >" + text + "</span>");
 
     },
     fChangeToRecording: function () {
@@ -185,8 +199,8 @@ $p.mic_fa = {
         });
         $("#" + this.micSpanId).html("<i id=" + this.micId + "></i>");
         $("#" + this.micId).addClass(this.fontAwesomeMic);
-        $("#" + this.micId).css({ 'font-size': '2em', });
-        $("#" + this.containerId).append("<span style='display: block;font-size: 1em;' >" + text + "</span>");
+        $("#" + this.micId).css({ 'font-size': '1.5em', });
+        $("#" + this.containerId).append("<span style='display: block;font-size: 0.7em;' >" + text + "</span>");
     },
     fChangeToRecording: function () {
         if (this.isRecording) {
@@ -221,6 +235,10 @@ $p.handWriting = {
         this.fCreateChild($element);
 
     },
+    fRemove: function ($element) {
+        this.pId = $element.attr("id") + "_hand_writing";
+        $("#" + this.pId).remove();
+    },
     fCreateChild: function ($element) {
         $element.after("<canvas id=" + this.pId + "></canvas>");
         $("#" + this.pId).css({
@@ -237,7 +255,6 @@ $p.handWriting = {
         $p.handWritingCanvas.setCallBack(function (pCallBack) {
             $p.textArea.fSetText(pCallBack[0]);
         })
-        // $p.handWritingCanvas.recognize();
     },
 
 
@@ -504,5 +521,61 @@ $p.handWritingCanvas = {
         this.trace = [];
     },
 }
+$p.handIcon = {
+    fCreate : function($parentId){
+        this.handSpanId = $parentId + "_hand_span" ;
+        this.containerId = $parentId + "_hand_container";
+        this.handId = $parentId + "_hand";
+        this.fontAwesomeMic = "fa-solid fa-pen";
+        this.isHandWriting = false;
+        this.fCreateChild($parentId);
 
+        $("#" + this.containerId).click(this.fOnClick.bind(this));
+
+        return this;
+    },
+    fCreateChild : function($parentId){
+        var text = "قلم";
+        $("#" + $parentId).append("<div id=" + this.containerId + "></div>");
+        $("#" + this.containerId).append("<span id=" + this.handSpanId + "></span>");
+        $("#" + this.containerId).css({
+            display: 'inline-block',
+            'text-align': 'center',
+            cursor: 'pointer',
+            'margin-left': '10px',
+            'margin-right': '10px',
+        });
+        $("#" + this.containerId).hover(function (e) {
+            $(this).css("color", e.type === "mouseenter" ? "maroon" : "grey")
+        });
+        $("#" + this.handSpanId).html("<i id=" + this.handId + "></i>");
+        $("#" + this.handId).addClass(this.fontAwesomeMic);
+        $("#" + this.handId).css({ 'font-size': '1.5em', });
+        $("#" + this.containerId).append("<span style='display: block;font-size: 0.7em;' >" + text + "</span>");
+    },
+    fOnClick : function(){
+        if (this.isHandWriting) {
+            this.isHandWriting = false;
+            this.fShow();
+        } else {
+            this.isHandWriting = true;
+            this.fShow();
+        }
+    },
+    fShow : function(){
+        if (this.isHandWriting) {
+            this.fChangeColor("#ff0000");
+            $("#" + this.handId).addClass("fa-fade");
+            $p.spr.fShowHandWriting(true);
+            
+        } else {
+            this.fChangeColor("grey");
+            $("#" + this.handId).removeClass("fa-fade");
+            $p.spr.fShowHandWriting(false);
+        }
+    },
+    fChangeColor: function (pColor) {
+        $("#" + this.handSpanId).css("color", pColor);
+    },
+}
 

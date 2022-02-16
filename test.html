@@ -15,13 +15,24 @@
         height: 300px;
         margin:0 auto;
         text-align:center;
-        background-color: aqua;
+        }
+        #icons{
+        position: relative;
+        width: 200px;
+        height: 50px;
+        text-align:center;
+        }
+        #hand{
+        position: fixed;
+        width: 400px;
+        height: 300px;
+        margin:0 auto;
         }
         
     </style>
     <script >
         $(document).ready(function(){
-            $p.spr.fLoad($("#content"));
+            $p.spr.fLoad($("#content"),$("#icons"),$("#hand"),);
         });
     </script>
     
@@ -29,8 +40,9 @@
 </head>
 
 <body>
-    <div id="content">
-    </div>
+    <div id="content"></div>
+    <div id="icons"></div>
+    <div id="hand"></div>
 </body>
 
 </html>
