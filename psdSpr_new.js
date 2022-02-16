@@ -1,38 +1,81 @@
-//TODO comment this when publish on server
-$p={}
+$p = {}
+
+jQuery.fn.exists = function () { return this.length > 0; }
+
+function createNewElement(text_id,elementType) {
+    var spr_suffix = "spr_";
+
+    console.warn('Element with id = "' + text_id + '" Not Found , and spr create an element with id = "' + spr_suffix + text_id + '" for you');
+
+    $("body").append("<"+elementType+" style='display:block;'  id='" + spr_suffix + text_id + `'>${text_id}</`+elementType+`>`);
+
+    return $("#" + spr_suffix + text_id);
+}
+function existElement($elementId) {
+    return typeof $elementId != "undefined" || $elementId != null || $("#" + $elementId).length > 0 ;
+    
+}
+function Checkelement(id,type) {
+    if (existElement(id)) {
+        return $("#" + id);
+    } else {
+        console.error(`element ${type}  Not Found , please user spr.fCreate() instead`);
+    }
+
+}
+
 $p.spr = {
-    fLoad: function ($textId, $englishIconId, $farsiIconId, $canvasIconId, $canvasId,$clearIconId) {
+    fLoad: function ($textId, $englishIconId, $farsiIconId, $canvasIconId, $canvasId, $clearIconId) {
 
-        this.fInitialize();
+        this.textElement = Checkelement($textId,"TextArea");
+        this.EnglishIconElement = Checkelement($englishIconId,"EnglishIcon");
+        this.FarsiIconElement = Checkelement($farsiIconId,"FarsiIcon");
 
-        this.textId = $textId;
-        this.canvasId = $canvasId;
+        
+        this.EnglishIconElement = $("#" + $englishIconId) ?? document.createElement($englishIconId ?? "englishIconId");
+        this.FarsiIconElement = $("#" + $farsiIconId) ?? document.createElement($farsiIconId ?? "farsiIconId");
+        this.CanvasIconElement = $("#" + $canvasIconId) ?? document.createElement($canvasIconId ?? "canvasIconId");
+        this.CanvasElement = $("#" + $canvasId) ?? document.createElement($canvasId ?? "canvasId");
+        this.ClearIconElement = $("#" + $clearIconId) ?? document.createElement($clearIconId ?? "clearIconId");
+
+
+
+        this.EnglishIconElement.click({ lang: "en-US" }, this.fOnStart.bind(this));
+        this.FarsiIconElement.click({ lang: "fa-IR" }, this.fOnStart.bind(this));
+        this.CanvasIconElement.click(this.fOnShowHandWriting.bind(this));
+
+
+        var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+
+        this.recognation = new SpeechRecognition();
+        this.recognation.continuous = true;
+        this.recognation.interimResults = true;
+        this.recognation.lang = 'en-US';
+        this.recognation.onresult = this.fOnResult.bind(this);
+
+        this.final_transcript = "";
         this.isRecording = false;
-        this.isHandWriting = $("#" + $canvasId).is(':visible');
+        this.isHandWriting = this.CanvasElement.is(':visible');
 
 
-        $("#" + $englishIconId).click({ lang: "en-US" }, this.fOnStart.bind(this));
 
-        $("#" + $farsiIconId).click({ lang: "fa-IR" }, this.fOnStart.bind(this));
 
-        $("#" + $canvasIconId).click(this.fOnShowHandWriting.bind(this));
 
-       
-        //waring  if not use hand writing comment this lines
-        $p.hw.fCreateHandWriting($("#" + $canvasId)[0]);
-        $p.hw.setCallBack(this.fWriteOnText.bind(this));
+        //TODO  باید چک شود المنتی با این  ای دی پیدا نمی شود 
+        // $p.hw.fCreateHandWriting($("#" + $canvasId)[0]);
+        // $p.hw.setCallBack(this.fWriteOnText.bind(this));
 
-        $("#" + $clearIconId).click($p.hw.erase.bind($p.hw));
+        // $("#" + $clearIconId).click($p.hw.erase.bind($p.hw));
 
 
     },
-    fInitialize: function () {
-        this.speechRecognition = new webkitSpeechRecognition();
-        this.speechRecognition.continuous = true;
-        this.speechRecognition.interimResults = true;
-        this.speechRecognition.lang = 'en-US';
-        this.speechRecognition.onresult = this.fOnResult.bind(this);
-        this.final_transcript = "";
+    
+    fCreationElement: function ($elementId, $elementType = "div", $elementpostfixId = "element") {
+        if (typeof $elementId == "undefined") {
+            return createNewElement($elementpostfixId,$elementType);
+        } else {
+            return $("#" + $elementId).exists() ? $("#" + $elementId) : createNewElement($elementId,$elementType);
+        }
     },
     fOnStart: function (event) {
         if (this.isRecording) {
@@ -41,49 +84,49 @@ $p.spr = {
         } else {
             this.isRecording = true;
             this.fChangeLanguage(event.data.lang);
-            this.speechRecognition.start();
+            this.recognation.start();
         }
     },
     fOnStop: function () {
-        this.speechRecognition.stop();
+        this.recognation.stop();
     },
     fChangeLanguage: function (language) {
-        this.speechRecognition.lang = language;
+        this.recognation.lang = language;
     },
     fOnResult: function (event) {
-        
+
         var interim_transcript = "";
         for (var i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-              this.final_transcript += event.results[i][0].transcript;
-              console.log("final = " + this.final_transcript);
-              this.fWriteOnText(this.final_transcript);
+                this.final_transcript += event.results[i][0].transcript;
+                console.log("final = " + this.final_transcript);
+                this.fWriteOnText(this.final_transcript);
             } else {
-              interim_transcript += event.results[i][0].transcript;
-              console.log("interim = " + interim_transcript);
-              this.fWriteOnText(this.final_transcript+interim_transcript);
+                interim_transcript += event.results[i][0].transcript;
+                console.log("interim = " + interim_transcript);
+                this.fWriteOnText(this.final_transcript + interim_transcript);
             }
-          }
+        }
         // var result = event.results[event.results.length - 1];
         // if (result.isFinal) {
         //     this.fWriteContinuseOnText(result[0].transcript);
         // }
     },
     fWriteContinuseOnText: function (text) {
-        $("#" + this.textId).text(function (i, old) {
+        this.textElement.text(function (i, old) {
             return old + text;
         });
     },
     fWriteOnText: function (text) {
-        $("#" + this.textId).text(text);
+        this.textElement.text(text);
     },
     fOnShowHandWriting: function () {
         if (this.isHandWriting) {
             this.isHandWriting = false;
-            $("#" + this.canvasId).hide();
+            this.CanvasElement.hide();
         } else {
             this.isHandWriting = true;
-            $("#" + this.canvasId).show();
+            this.CanvasElement.show();
         }
 
     }
