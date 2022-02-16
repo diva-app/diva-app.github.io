@@ -2,139 +2,195 @@ $p = {}
 
 jQuery.fn.exists = function () { return this.length > 0; }
 
-function createNewElement(text_id,elementType) {
-    var spr_suffix = "spr_";
 
-    console.warn('Element with id = "' + text_id + '" Not Found , and spr create an element with id = "' + spr_suffix + text_id + '" for you');
-
-    $("body").append("<"+elementType+" style='display:block;'  id='" + spr_suffix + text_id + `'>${text_id}</`+elementType+`>`);
-
-    return $("#" + spr_suffix + text_id);
-}
 function existElement($elementId) {
-    return typeof $elementId != "undefined" || $elementId != null || $("#" + $elementId).length > 0 ;
-    
+    return typeof $elementId != "undefined" & $elementId != null & $("#" + $elementId).length > 0;
 }
-function Checkelement(id,type) {
-    if (existElement(id)) {
-        return $("#" + id);
-    } else {
-        console.error(`element ${type}  Not Found , please user spr.fCreate() instead`);
-    }
-
+function showWarning(type) {
+    console.error(`${type} Error = ` + `المان  معرفی نشده و یا ای دی معرفی شده درست نمی باشد . ممکن است فایل درست اجرا نشود`);
+}
+function getElement(id) {
+    return $("#" + id);
 }
 
 $p.spr = {
-    fLoad: function ($textId, $englishIconId, $farsiIconId, $canvasIconId, $canvasId, $clearIconId) {
+    fGenerateSPR: function ($content) {
+        if (existElement($content)) {
+            var textArea = this.fCreateSPR_TextArea($content);
+            var enIcon = this.fCreateSPR_Microphone($content, "en");
+            var faIcon = this.fCreateSPR_Microphone($content, "fa");
+            this.isGeneration = true;
+            this.fLoad(textArea, enIcon, faIcon);
 
-        this.textElement = Checkelement($textId,"TextArea");
-        this.EnglishIconElement = Checkelement($englishIconId,"EnglishIcon");
-        this.FarsiIconElement = Checkelement($farsiIconId,"FarsiIcon");
+        } else {
+            showWarning("Content");
+        }
+    },
+    fCreateSPR_TextArea: function (contentId) {
+        var pId = contentId + "_textarea";
+        getElement(contentId).append("<textarea id=" + pId + "></textarea>");
+        getElement(pId).css({
+            'position': 'relative',
+            display: 'block',
+            'padding': '10px',
+            'border-radius': '10px',
+        });
+        return pId;
+    },
+    fCreateSPR_Microphone: function (contentId, lang) {
+        var containerId = contentId + "_mic_container_" + lang;
+        getElement(contentId).append("<div id=" + containerId + "></div>");
 
-        
-        this.EnglishIconElement = $("#" + $englishIconId) ?? document.createElement($englishIconId ?? "englishIconId");
-        this.FarsiIconElement = $("#" + $farsiIconId) ?? document.createElement($farsiIconId ?? "farsiIconId");
-        this.CanvasIconElement = $("#" + $canvasIconId) ?? document.createElement($canvasIconId ?? "canvasIconId");
-        this.CanvasElement = $("#" + $canvasId) ?? document.createElement($canvasId ?? "canvasId");
-        this.ClearIconElement = $("#" + $clearIconId) ?? document.createElement($clearIconId ?? "clearIconId");
+        let container = getElement(containerId);
+        container.css({
+            display: 'inline-block',
+            'text-align': 'center',
+            cursor: 'pointer',
+            'margin-left': '10px',
+            'margin-right': '10px',
+            color: 'grey',
+        });
+        let color = lang == "en" ? "blue" : "green";
+        container.hover(function (e) {
+            $(this).css("color", e.type === "mouseenter" ? color : "grey")
+        });
 
 
+        var micSpanId = contentId + "_mic_span_" + lang;
+        container.append("<span id=" + micSpanId + " ></span>");
 
-        this.EnglishIconElement.click({ lang: "en-US" }, this.fOnStart.bind(this));
-        this.FarsiIconElement.click({ lang: "fa-IR" }, this.fOnStart.bind(this));
-        this.CanvasIconElement.click(this.fOnShowHandWriting.bind(this));
+        var micSpan = getElement(micSpanId);
 
 
-        var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+        var micId = contentId + "_mic_" + lang;
+        micSpan.html("<i id=" + micId + "></i>");
+
+        let mic = getElement(micId);
+
+        mic.addClass("fa-solid fa-microphone ");
+        mic.css({ 'font-size': '1.5em', });
+
+        var isRecording = false;
+        mic.click(function () {
+            if (isRecording) {
+                isRecording = false;
+                mic.css({ color: 'grey' });
+                mic.removeClass("fa-fade");
+            } else {
+                isRecording = true;
+                mic.css({ color: 'red' });
+                mic.addClass("fa-fade");
+            }
+
+        });
+
+        let text = lang == "en" ? "فارسی" : "انگلیسی";
+        container.append("<span style='display: block;font-size: 0.7em;' >" + text + "</span>");
+
+
+        return micId;
+
+    },
+    fLoad: function ($textId, $englishIconId, $farsiIconId) {
+
+        this.fLoadTextArea($textId);
+
+        this.fLoadMicrophons($englishIconId, $farsiIconId);
+
+        this.fLoadRecognation();
+
+        this.final_transcript = "";
+        this.isRecording = false;
+        self = this;
+
+    },
+    fLoadRecognation: function () {
+        var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 
         this.recognation = new SpeechRecognition();
         this.recognation.continuous = true;
         this.recognation.interimResults = true;
         this.recognation.lang = 'en-US';
-        this.recognation.onresult = this.fOnResult.bind(this);
-
-        this.final_transcript = "";
-        this.isRecording = false;
-        this.isHandWriting = this.CanvasElement.is(':visible');
-
-
-
-
-
-        //TODO  باید چک شود المنتی با این  ای دی پیدا نمی شود 
-        // $p.hw.fCreateHandWriting($("#" + $canvasId)[0]);
-        // $p.hw.setCallBack(this.fWriteOnText.bind(this));
-
-        // $("#" + $clearIconId).click($p.hw.erase.bind($p.hw));
-
-
+        this.recognation.onresult = this.fOnResult.bind(this.self);
+        this.recognation.onend = this.fOnEnd.bind(this.self);
     },
-    
-    fCreationElement: function ($elementId, $elementType = "div", $elementpostfixId = "element") {
-        if (typeof $elementId == "undefined") {
-            return createNewElement($elementpostfixId,$elementType);
+    fLoadTextArea: function ($textId) {
+        if (existElement($textId)) {
+            this.textElement = getElement($textId);
         } else {
-            return $("#" + $elementId).exists() ? $("#" + $elementId) : createNewElement($elementId,$elementType);
+            showWarning("TextArea");
+        }
+    },
+    fLoadMicrophons: function ($englishIconId, $farsiIconId) {
+        if (existElement($englishIconId)) {
+            this.EnglishIconElement = getElement($englishIconId);
+            this.EnglishIconElement.click({ lang: "en-US" }, this.fOnStart.bind(this));
+        } else {
+            showWarning("English Icon");
+        }
+        if (existElement($farsiIconId)) {
+            this.FarsiIconElement = getElement($farsiIconId);
+            this.FarsiIconElement.click({ lang: "fa-IR" }, this.fOnStart.bind(this));
+        } else {
+            showWarning("Farsi Icon");
         }
     },
     fOnStart: function (event) {
         if (this.isRecording) {
             this.isRecording = false;
-            this.fOnStop();
+            this.recognation.stop();
         } else {
             this.isRecording = true;
             this.fChangeLanguage(event.data.lang);
             this.recognation.start();
         }
     },
-    fOnStop: function () {
-        this.recognation.stop();
-    },
     fChangeLanguage: function (language) {
         this.recognation.lang = language;
     },
     fOnResult: function (event) {
-
         var interim_transcript = "";
         for (var i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
                 this.final_transcript += event.results[i][0].transcript;
-                console.log("final = " + this.final_transcript);
                 this.fWriteOnText(this.final_transcript);
             } else {
                 interim_transcript += event.results[i][0].transcript;
-                console.log("interim = " + interim_transcript);
                 this.fWriteOnText(this.final_transcript + interim_transcript);
             }
         }
-        // var result = event.results[event.results.length - 1];
-        // if (result.isFinal) {
-        //     this.fWriteContinuseOnText(result[0].transcript);
-        // }
-    },
-    fWriteContinuseOnText: function (text) {
-        this.textElement.text(function (i, old) {
-            return old + text;
-        });
     },
     fWriteOnText: function (text) {
         this.textElement.text(text);
     },
-    fOnShowHandWriting: function () {
-        if (this.isHandWriting) {
-            this.isHandWriting = false;
-            this.CanvasElement.hide();
-        } else {
-            this.isHandWriting = true;
-            this.CanvasElement.show();
+    fOnEnd: function () {
+        if (this.self.isGeneration) {
+            this.self.EnglishIconElement.css({ color: 'grey' });
+            this.self.EnglishIconElement.removeClass("fa-fade");
+            this.self.FarsiIconElement.css({ color: 'grey' });
+            this.self.FarsiIconElement.removeClass("fa-fade");
         }
-
+        this.self.isRecording = false;
     }
-
 }
 
 
 $p.hw = {
+    fLoad: function ($textId, $canvasIconId, $canvasId, $clearIconId) {
+        this.textElement = Checkelement($textId, "TextArea");
+
+        this.CanvasIconElement = $("#" + $canvasIconId) ?? document.createElement($canvasIconId ?? "canvasIconId");
+        this.CanvasElement = $("#" + $canvasId) ?? document.createElement($canvasId ?? "canvasId");
+        this.ClearIconElement = $("#" + $clearIconId) ?? document.createElement($clearIconId ?? "clearIconId");
+
+        this.CanvasIconElement.click(this.fOnShowHandWriting.bind(this));
+        this.isHandWriting = this.CanvasElement.is(':visible');
+
+        this.fCreateHandWriting($("#" + $canvasId)[0]);
+        this.setCallBack(this.fWriteOnText.bind(this));
+
+        $("#" + $clearIconId).click(this.erase.bind($p.hw));
+    },
     fCreateHandWriting: function (cvs, lineWidth) {
         this.canvas = cvs;
         this.cxt = cvs.getContext("2d");
@@ -161,17 +217,6 @@ $p.hw = {
         cvs.addEventListener("touchstart", this.touchStart.bind(this));
         cvs.addEventListener("touchmove", this.touchMove.bind(this));
         cvs.addEventListener("touchend", this.touchEnd.bind(this));
-
-        // const dpr = window.devicePixelRatio;
-        // this.height = document.body.offsetHeight;
-        // this.width = document.body.offsetWidth;
-
-        // this.canvas.style.height = this.height + "px";
-        // this.canvas.style.width = this.width + "px";
-        // this.canvas.setAttribute("width", (this.width * dpr) + "px");
-        // this.canvas.setAttribute("height", (this.height * dpr) + "px");
-
-        // this.cxt.scale(dpr, dpr);
     },
     mouseDown: function (e) {
         // new stroke
@@ -310,5 +355,16 @@ $p.hw = {
         this.cxt.clearRect(0, 0, this.width, this.height);
 
     },
+    fOnShowHandWriting: function () {
+        if (this.isHandWriting) {
+            this.isHandWriting = false;
+            this.CanvasElement.hide();
+        } else {
+            this.isHandWriting = true;
+            this.CanvasElement.show();
+        }
+
+    }
+
 };
 
