@@ -101,7 +101,7 @@ $p.spr = {
 
         this.final_transcript = "";
         this.isRecording = false;
-        self = this;
+        this.self = this;
 
     },
     fLoadRecognation: function () {
@@ -111,8 +111,8 @@ $p.spr = {
         this.recognation.continuous = true;
         this.recognation.interimResults = true;
         this.recognation.lang = 'en-US';
-        this.recognation.onresult = this.fOnResult.bind(this.self);
-        this.recognation.onend = this.fOnEnd.bind(this.self);
+        this.recognation.onresult = this.fOnResult.bind(this);
+        this.recognation.onend = this.fOnEnd.bind(this);
     },
     fLoadTextArea: function ($textId) {
         if (existElement($textId)) {
