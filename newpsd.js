@@ -34,25 +34,27 @@ $p.spr = {
         this.speechRecognition.onend = this.fOnEnd.bind(this);
     },
     fStart: function () {
-        // alert("start");
+        console.log("recording is start ");
         this.speechRecognition.start();
     },
     fStop: function () {
-        // alert("stop");
+        console.log("recording is start ");
         this.speechRecognition.stop();
 
     },
     fChangeLanguage: function (language) {
-        // alert("change language to " + language);
+        console.log("change to language ", language);
         this.speechRecognition.lang = language;
     },
     fOnResult: function (event) {
         var result = event.results[event.results.length - 1];
+        console.log("this is recording result ", result);
         if (result.isFinal) {
             this.textArea.fSetText(result[0].transcript);
         }
     },
     fOnEnd: function () {
+        console.log("recording end ");
         this.mic_en.isRecording = false;
         this.mic_en.fChangeToRecording();
         this.mic_fa.isRecording = false;
@@ -108,10 +110,12 @@ $p.mic_en = {
     },
     fOnClick: function () {
         if (this.isRecording) {
+            console.log("recording is stop ");
             this.isRecording = false;
             this.fChangeToRecording();
             $p.spr.fStop();
         } else {
+            console.log("recording is start ");
             this.isRecording = true;
             this.fChangeToRecording();
             $p.spr.fChangeLanguage(this.$lang);

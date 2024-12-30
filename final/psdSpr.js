@@ -105,6 +105,12 @@ $p.spr = {
 
     },
     fLoadRecognation: function () {
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            console.log("speech recognition API supported");
+        }
+        else {
+            console.log("speech recognition API not supported")
+        }
         var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
 
         this.recognation = new SpeechRecognition();
@@ -140,6 +146,7 @@ $p.spr = {
             this.isRecording = false;
             this.recognation.stop();
         } else {
+            console.log("is recording ...");
             this.isRecording = true;
             this.fChangeLanguage(event.data.lang);
             this.recognation.start();
@@ -150,6 +157,7 @@ $p.spr = {
     },
     fOnResult: function (event) {
         var interim_transcript = "";
+        console.log("this is text to event : ", event);
         for (var i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
                 this.final_transcript += event.results[i][0].transcript;
@@ -161,10 +169,12 @@ $p.spr = {
         }
     },
     fWriteOnText: function (text) {
+        console.log("this is text to write : ", text);
         this.textElement.text(text);
     },
     fOnEnd: function () {
         if (this.self.isGeneration) {
+            console.log("end of speach ");
             this.self.EnglishIconElement.css({ color: 'grey' });
             this.self.EnglishIconElement.removeClass("fa-fade");
             this.self.FarsiIconElement.css({ color: 'grey' });
